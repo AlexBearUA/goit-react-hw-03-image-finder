@@ -1,30 +1,50 @@
-import { Formik, Form, Field } from 'formik';
+import React, { Component } from 'react';
 import { ImSearch } from 'react-icons/im';
-
+import { toast } from 'react-toastify';
 import css from './Searchbar.module.scss';
 
-export const Searchbar = ({ onSubmit }) => {
-  const handleSubmit = (values, actions) => {
-    onSubmit(values);
-    actions.resetForm();
+class Searchbar extends Component {
+  state = {
+    searchQuery: '',
   };
-  return (
-    <header className={css.Searchbar}>
-      <Formik initialValues={{ searchQuery: '' }} onSubmit={handleSubmit}>
-        <Form className={css.SearchForm}>
+
+  handleSearchQueryChange = e => {
+    this.setState({ searchQuery: e.currentTarget.value.toLowerCase() });
+  };
+
+  handleSubmit = e => {
+    e.preventDefault();
+
+    if (this.state.searchQuery.trim() === '') {
+      return toast.error('Fill in the search field');
+    }
+
+    this.props.onSubmit(this.state.searchQuery);
+    this.setState({ searchQuery: '' });
+  };
+
+  render() {
+    return (
+      <header className={css.Searchbar}>
+        <form className={css.SearchForm} onSubmit={this.handleSubmit}>
           <button className={css.SearchFormButton} type="submit">
             <ImSearch className={css.SearchFormButtonIcon} />
           </button>
-          <label>
-            <Field
-              className={css.SearchFormIinput}
-              placeholder="Search images..."
-              name="searchQuery"
-              type="text"
-            ></Field>
-          </label>
-        </Form>
-      </Formik>
-    </header>
-  );
-};
+
+          <input
+            className={css.SearchFormIinput}
+            type="text"
+            name="searchQuery"
+            value={this.state.searchQuery}
+            onChange={this.handleSearchQueryChange}
+            autoComplete="off"
+            autoFocus
+            placeholder="Search images and photos"
+          />
+        </form>
+      </header>
+    );
+  }
+}
+
+export default Searchbar;
