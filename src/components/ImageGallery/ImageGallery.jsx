@@ -11,7 +11,6 @@ class ImageGallery extends Component {
     images: [],
     total: 0,
     loading: false,
-    responseIsEmpty: null,
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -24,10 +23,10 @@ class ImageGallery extends Component {
           `https://pixabay.com/api/?q=${nextSearchQuery}&page=1&key=34213016-753010ce7a0400954b4163a43&image_type=photo&orientation=horizontal&per_page=12`
         )
         .then(({ data: { total, hits: images } }) => {
-          this.setState({ total, images });
           if (images.length === 0) {
-            this.setState({ responseIsEmpty: true });
+            return toast.error('There are no images on your searchquery');
           }
+          this.setState({ total, images });
         })
         .catch(error => console.log(error))
         .finally(() => this.setState({ loading: false }));
@@ -35,10 +34,9 @@ class ImageGallery extends Component {
   }
 
   render() {
-    const { images, loading, responseIsEmpty } = this.state;
+    const { images, loading } = this.state;
     return (
       <>
-        {responseIsEmpty && alert('There are no images on your searchquery')}
         {images && (
           <ul className={css.ImageGallery}>
             {images.map(({ id, tags, webformatURL }) => (
