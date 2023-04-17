@@ -32,7 +32,9 @@ class ImageGallery extends Component {
     ) {
       this.setState({ isloading: true });
       this.setState({ loadMore: false });
-
+      if (nextSearchQuery !== prevSearchQuery) {
+        this.setState({ page: 1, images: [] });
+      }
       imagesAPI
         .fetchImages(nextSearchQuery, this.state.page)
         .then(({ data: { total, hits: images } }) => {
