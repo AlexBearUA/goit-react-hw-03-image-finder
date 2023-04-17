@@ -12,6 +12,7 @@ class ImageGallery extends Component {
     images: [],
     total: 0,
     isloading: false,
+    loadMore: false,
     page: 1,
   };
 
@@ -25,8 +26,12 @@ class ImageGallery extends Component {
     const prevSearchQuery = prevProps.searchQuery;
     const nextSearchQuery = this.props.searchQuery;
 
-    if (prevSearchQuery !== nextSearchQuery) {
-      this.setState({ isloading: true, images: null });
+    if (
+      prevState.page !== this.state.page ||
+      nextSearchQuery !== prevSearchQuery
+    ) {
+      this.setState({ isloading: true });
+      this.setState({ loadMore: false });
 
       imagesAPI
         .fetchImages(nextSearchQuery, this.state.page)
@@ -34,31 +39,32 @@ class ImageGallery extends Component {
           if (images.length === 0) {
             return toast.error('There are no images on your searchquery');
           }
-          this.setState({ total, images });
+          this.setState({ loadMore: true });
+          this.setState(prevState => ({
+            total,
+            images: [...prevState.images, ...images],
+          }));
         })
         .catch(error => console.log(error))
         .finally(() => this.setState({ isloading: false }));
     }
   }
 
-  loadImages = () => {};
-
   render() {
-    const { images, isloading } = this.state;
+    const { images, isloading, loadMore } = this.state;
     return (
       <>
-        {images && (
-          <ul className={css.ImageGallery}>
-            {images.map(({ id, tags, webformatURL }) => (
-              <ImageGalleryItem
-                key={id}
-                webFormatUrl={webformatURL}
-                tags={tags}
-              />
-            ))}
-          </ul>
-        )}
-        <LoadMoreBtn onClick={this.loadMore} />
+        <ul className={css.ImageGallery}>
+          {images.map(({ id, tags, webformatURL }) => (
+            <ImageGalleryItem
+              key={id}
+              webFormatUrl={webformatURL}
+              tags={tags}
+            />
+          ))}
+        </ul>
+
+        {loadMore && <LoadMoreBtn onClick={this.loadMore} />}
         {isloading && <Loader />}
       </>
     );
