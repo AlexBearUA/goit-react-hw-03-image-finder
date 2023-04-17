@@ -1,27 +1,35 @@
 import React, { Component } from 'react';
-import axios from 'axios';
 import { toast } from 'react-toastify';
-
 import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
+import imagesAPI from '../../services/images-api';
 import { Loader } from 'components/Loader/Loader';
+import { LoadMoreBtn } from 'components/LoadMoreBtn/LoadMoreBtn';
+
 import css from './ImageGallery.module.scss';
 
 class ImageGallery extends Component {
   state = {
     images: [],
     total: 0,
-    loading: false,
+    isloading: false,
+    page: 1,
+  };
+
+  loadMore = () => {
+    this.setState(prevState => ({
+      page: prevState.page + 1,
+    }));
   };
 
   componentDidUpdate(prevProps, prevState) {
     const prevSearchQuery = prevProps.searchQuery;
     const nextSearchQuery = this.props.searchQuery;
+
     if (prevSearchQuery !== nextSearchQuery) {
-      this.setState({ loading: true, images: null });
-      axios
-        .get(
-          `https://pixabay.com/api/?q=${nextSearchQuery}&page=1&key=34213016-753010ce7a0400954b4163a43&image_type=photo&orientation=horizontal&per_page=12`
-        )
+      this.setState({ isloading: true, images: null });
+
+      imagesAPI
+        .fetchImages(nextSearchQuery, this.state.page)
         .then(({ data: { total, hits: images } }) => {
           if (images.length === 0) {
             return toast.error('There are no images on your searchquery');
@@ -29,12 +37,14 @@ class ImageGallery extends Component {
           this.setState({ total, images });
         })
         .catch(error => console.log(error))
-        .finally(() => this.setState({ loading: false }));
+        .finally(() => this.setState({ isloading: false }));
     }
   }
 
+  loadImages = () => {};
+
   render() {
-    const { images, loading } = this.state;
+    const { images, isloading } = this.state;
     return (
       <>
         {images && (
@@ -48,7 +58,8 @@ class ImageGallery extends Component {
             ))}
           </ul>
         )}
-        {loading && <Loader />}
+        <LoadMoreBtn onClick={this.loadMore} />
+        {isloading && <Loader />}
       </>
     );
   }
