@@ -9,10 +9,17 @@
   width: 100%;
   height: 310px;
   object-fit: cover;
+  object-position: center;
 
   transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
   &:hover {
     transform: scale(1.03);
     cursor: zoom-in;
   }
+}
+
+.ImageGalleryBigPicture {
+  width: 100%;
+  height: 750px;
+  object-fit: cover;
 }
