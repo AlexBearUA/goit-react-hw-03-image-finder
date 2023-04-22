@@ -8,18 +8,18 @@ import ImageGalleryItem from './ImageGalleryItem/ImageGalleryItem';
 import { Loader } from './Loader/Loader';
 import { LoadMoreBtn } from './LoadMoreBtn/LoadMoreBtn';
 import { ImageGallery } from './ImageGallery/ImageGallery';
-
+import { scrollOnLoading } from '../services/scroll';
 class App extends Component {
   state = {
     searchQuery: '',
     images: [],
+    page: 1,
     isloading: false,
     loadMore: false,
-    page: 1,
     endOfCollection: false,
   };
 
-  async componentDidUpdate(_, prevState) {
+  componentDidUpdate(_, prevState) {
     const { searchQuery, page, images } = this.state;
 
     if (prevState.searchQuery !== searchQuery || prevState.page !== page) {
@@ -31,7 +31,7 @@ class App extends Component {
       imagesAPI
         .fetchImages(searchQuery, page)
         .then(({ data: { totalHits, hits: fetchedImages } }) => {
-          if (fetchedImages.length === 0) {
+          if (totalHits === 0) {
             return toast.error('There are no images on your searchquery');
           }
 
@@ -42,17 +42,21 @@ class App extends Component {
               ...this.normalaziedImages(fetchedImages),
             ],
           }));
-          console.log(images.length);
 
           images.length + 12 < totalHits && this.setState({ loadMore: true });
 
-          images.length + 12 >= totalHits &&
-            images.length !== 0 &&
+          if (
+            fetchedImages.length === totalHits ||
+            (images.length + 12 >= totalHits && images.length !== 0)
+          ) {
             this.setState({ endOfCollection: true });
+          }
         })
         .catch(error => console.log(error))
         .finally(() => this.setState({ isloading: false }));
     }
+
+    this.state.page > 1 && scrollOnLoading();
   }
 
   handleSearchSubmit = searchQuery => {
@@ -90,7 +94,6 @@ class App extends Component {
               />
             ))}
         </ImageGallery>
-        {/* {scrollOnLoading()} */}
         {loadMore && <LoadMoreBtn onClick={this.loadMore} />}
         {isloading && <Loader />}
         {endOfCollection && (

@@ -3,7 +3,7 @@ export function scrollOnLoading() {
     .querySelector('.ImageGallery')
     .firstElementChild.getBoundingClientRect();
   window.scrollBy({
-    top: cardHeight * 1.75,
+    top: cardHeight * 2.47,
     behavior: 'smooth',
   });
 }
