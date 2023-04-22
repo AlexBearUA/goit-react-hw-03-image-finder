@@ -10,13 +10,13 @@ class Searchbar extends Component {
   };
 
   handleSearchQueryChange = e => {
-    this.setState({ searchQuery: e.currentTarget.value.toLowerCase() });
+    this.setState({ searchQuery: e.currentTarget.value.trim().toLowerCase() });
   };
 
   handleSubmit = e => {
     e.preventDefault();
 
-    if (this.state.searchQuery.trim() === '') {
+    if (this.state.searchQuery === '') {
       return toast.error('Fill in the search field');
     }
 
