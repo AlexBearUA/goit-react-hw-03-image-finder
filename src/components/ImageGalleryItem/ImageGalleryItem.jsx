@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import Modal from '../Modal/Modal';
 import css from './ImageGalleryItem.module.scss';
 
@@ -38,3 +39,9 @@ class ImageGalleryItem extends Component {
 }
 
 export default ImageGalleryItem;
+
+ImageGalleryItem.propTypes = {
+  webFormatUrl: PropTypes.string.isRequired,
+  largeImageUrl: PropTypes.string.isRequired,
+  tags: PropTypes.string.isRequired,
+};

@@ -16,11 +16,11 @@ class App extends Component {
     isloading: false,
     loadMore: false,
     page: 1,
-    // endOfCollection: false,
+    endOfCollection: false,
   };
 
   async componentDidUpdate(_, prevState) {
-    const { searchQuery, page } = this.state;
+    const { searchQuery, page, images } = this.state;
 
     if (prevState.searchQuery !== searchQuery || prevState.page !== page) {
       this.setState({
@@ -30,23 +30,25 @@ class App extends Component {
 
       imagesAPI
         .fetchImages(searchQuery, page)
-        .then(({ data: { totalHits, hits: images } }) => {
-          if (images.length === 0) {
+        .then(({ data: { totalHits, hits: fetchedImages } }) => {
+          if (fetchedImages.length === 0) {
             return toast.error('There are no images on your searchquery');
           }
 
-          images.length >= totalHits
-            ? this.setState({
-                loadMore: false,
-              })
-            : this.setState({
-                loadMore: true,
-              });
-
           this.setState(prevState => ({
             totalHits,
-            images: [...prevState.images, ...this.normalaziedImages(images)],
+            images: [
+              ...prevState.images,
+              ...this.normalaziedImages(fetchedImages),
+            ],
           }));
+          console.log(images.length);
+
+          images.length + 12 < totalHits && this.setState({ loadMore: true });
+
+          images.length + 12 >= totalHits &&
+            images.length !== 0 &&
+            this.setState({ endOfCollection: true });
         })
         .catch(error => console.log(error))
         .finally(() => this.setState({ isloading: false }));
@@ -54,7 +56,7 @@ class App extends Component {
   }
 
   handleSearchSubmit = searchQuery => {
-    this.setState({ searchQuery, page: 1, images: [] });
+    this.setState({ searchQuery, page: 1, images: [], endOfCollection: false });
   };
 
   loadMore = () => {
@@ -73,24 +75,27 @@ class App extends Component {
   }
 
   render() {
-    const { images, isloading, loadMore } = this.state;
+    const { images, isloading, loadMore, endOfCollection } = this.state;
     return (
       <>
         <Searchbar onSubmit={this.handleSearchSubmit} />
         <ImageGallery>
-          {images.map(({ id, tags, webformatURL, largeImageURL }) => (
-            <ImageGalleryItem
-              key={id}
-              webFormatUrl={webformatURL}
-              largeImageUrl={largeImageURL}
-              tags={tags}
-            />
-          ))}
+          {images &&
+            images.map(({ id, tags, webformatURL, largeImageURL }) => (
+              <ImageGalleryItem
+                key={id}
+                webFormatUrl={webformatURL}
+                largeImageUrl={largeImageURL}
+                tags={tags}
+              />
+            ))}
         </ImageGallery>
         {/* {scrollOnLoading()} */}
         {loadMore && <LoadMoreBtn onClick={this.loadMore} />}
         {isloading && <Loader />}
-        {/* {endOfCollection && <EndOfCollection />} */}
+        {endOfCollection && (
+          <p className="TheEnd">You've reached the end of search results.</p>
+        )}
         <ToastContainer autoClose={1000} />
       </>
     );

@@ -10,7 +10,7 @@ class Searchbar extends Component {
   };
 
   handleSearchQueryChange = e => {
-    this.setState({ searchQuery: e.currentTarget.value.trim().toLowerCase() });
+    this.setState({ searchQuery: e.currentTarget.value.toLowerCase() });
   };
 
   handleSubmit = e => {
@@ -20,7 +20,7 @@ class Searchbar extends Component {
       return toast.error('Fill in the search field');
     }
 
-    this.props.onSubmit(this.state.searchQuery);
+    this.props.onSubmit(this.state.searchQuery.trim());
     this.setState({ searchQuery: '' });
   };
 
@@ -38,7 +38,6 @@ class Searchbar extends Component {
             name="searchQuery"
             value={this.state.searchQuery}
             onChange={this.handleSearchQueryChange}
-            autoComplete="off"
             autoFocus
             placeholder="Search images and photos"
           />
