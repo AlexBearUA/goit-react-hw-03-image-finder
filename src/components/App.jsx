@@ -60,7 +60,14 @@ class App extends Component {
   }
 
   handleSearchSubmit = searchQuery => {
-    this.setState({ searchQuery, page: 1, images: [], endOfCollection: false });
+    searchQuery === this.state.searchQuery
+      ? toast.success('Images on your serchquery are already loaded')
+      : this.setState({
+          searchQuery,
+          page: 1,
+          images: [],
+          endOfCollection: false,
+        });
   };
 
   loadMore = () => {
@@ -99,7 +106,7 @@ class App extends Component {
         {endOfCollection && (
           <p className="TheEnd">You've reached the end of search results.</p>
         )}
-        <ToastContainer autoClose={1000} />
+        <ToastContainer autoClose={1500} />
       </>
     );
   }
