@@ -36,7 +36,6 @@ class App extends Component {
           }
 
           this.setState(prevState => ({
-            totalHits,
             images: [
               ...prevState.images,
               ...this.normalaziedImages(fetchedImages),
