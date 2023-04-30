@@ -42,14 +42,9 @@ class App extends Component {
             ],
           }));
 
-          images.length + 12 < totalHits && this.setState({ loadMore: true });
-
-          if (
-            fetchedImages.length === totalHits ||
-            (images.length + 12 >= totalHits && images.length !== 0)
-          ) {
-            this.setState({ endOfCollection: true });
-          }
+          images.length + 12 < totalHits
+            ? this.setState({ loadMore: true })
+            : this.setState({ endOfCollection: true });
         })
         .catch(error => console.log(error))
         .finally(() => this.setState({ isloading: false }));
